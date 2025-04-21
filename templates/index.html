@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📷 모델 추론 인터페이스</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    h2 { margin-bottom: 1rem; }
+    #result {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      background-color: #e9ecef;
+      padding: 1rem;
+      border-radius: 5px;
+      width: fit-content;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+    }
+    .label { font-weight: bold; }
+    #preview {
+      max-width: 300px;
+      margin-top: 1rem;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>📸 촬영 후 모델 추론</h2>
+  <button id="shootBtn">📷 촬영 시작</button>
+
+  <img id="preview" src="" alt="촬영 이미지" />
+
+  <div id="result" style="display: none;">
+    <div><span class="label">예측 라벨:</span> <span id="labelText"></span></div>
+    <div><span class="label">신뢰도:</span> <span id="confidenceText"></span></div>
+    <div><span class="label">처리 시간:</span> <span id="elapsedText"></span></div>
+  </div>
+
+  <script>
+    const shootBtn = document.getElementById('shootBtn');
+    const previewImg = document.getElementById('preview');
+    const resultBox = document.getElementById('result');
+    const labelText = document.getElementById('labelText');
+    const confidenceText = document.getElementById('confidenceText');
+    const elapsedText = document.getElementById('elapsedText');
+
+    shootBtn.addEventListener('click', async () => {
+      shootBtn.disabled = true;
+      shootBtn.textContent = '📷 촬영 중...';
+
+      try {
+        const res = await fetch('/predict', { method: 'POST' });
+        const data = await res.json();
+
+        if (data.error) {
+          alert("에러: " + data.error);
+        } else {
+          labelText.textContent = data.prediction;
+          confidenceText.textContent = (data.confidence * 100).toFixed(2) + '%';
+          elapsedText.textContent = data.elapsed_ms + ' ms';
+          resultBox.style.display = 'block';
+
+          // 이미지 미리보기 갱신
+          previewImg.src = data.image_url + '?t=' + new Date().getTime();
+        }
+      } catch (err) {
+        alert("서버 연결 실패: " + err.message);
+      }
+
+      shootBtn.disabled = false;
+      shootBtn.textContent = '📷 촬영 시작';
+    });
+  </script>
+</body>
+</html>
