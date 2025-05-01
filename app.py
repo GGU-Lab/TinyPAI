@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # 경로 설정
 IMAGE_NAME = "test.jpg"
-IMAGE_PATH = f"/home/tglab/test1_project/{IMAGE_NAME}"
+IMAGE_PATH = f"/home/tglab/TinyPAI/{IMAGE_NAME}"
 MODEL_PATH = os.path.join("models", "mobilenet_v1_1.0_224_quant.tflite")
 LABEL_PATH = os.path.join("models", "labels.txt")
 
@@ -70,7 +70,7 @@ def predict():
 # 정적 이미지 라우팅
 @app.route('/image')
 def get_image():
-    return send_from_directory('/home/tglab/test1_project', IMAGE_NAME)
+    return send_from_directory('/home/tglab/TinyPAI', IMAGE_NAME)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)  
